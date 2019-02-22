@@ -1,0 +1,30 @@
+include('C:\Users\Venkateswarlu\Downloads\lavacharts-3.1.9/src/Carbon.php');
+include('C:\Users\Venkateswarlu\Downloads\lavacharts-3.1.9/src/Lavacharts.php');
+    
+$lava = new \Khill\Lavacharts\Lavacharts;
+$datatable =\Lava::DataTable();
+$datatable->addStringColumn('Name');
+$datatable->addNumberColumn('Donuts Eaten');
+$datatable->addRows([
+    ['Michael',   5],
+    ['Elisa',     7],
+    ['Robert',    3],
+    ['John',      2],
+    ['Jessica',   6],
+    ['Aaron',     1],
+    ['Margareth', 8]
+]);
+$pieChart = $lava->PieChart('Donuts', $datatable, [
+    'width' => 400,
+    'pieSliceText' => 'value'
+]);
+$filter  = $lava->NumberRangeFilter(1, [
+    'ui' => [
+        'labelStacking' => 'vertical'
+    ]
+]);
+$control = $lava->ControlWrapper($filter, 'control');
+$chart   = $lava->ChartWrapper($pieChart, 'chart');
+Lava::Dashboard('Donuts')->bind($control, $chart);
+
+?>
