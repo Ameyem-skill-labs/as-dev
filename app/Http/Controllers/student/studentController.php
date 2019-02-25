@@ -654,72 +654,83 @@ class studentController extends Controller
 
     public function viewResult($id,Request $request){
         $score = null;
-        $total = null;
         // return
         $quiz_id = hd($request->id);
-        $questions = online_quiz_questions::where('online_quiz_id',$quiz_id)->get();
+        $userid=Auth::user()->id;
+        // return 
+        $questions = online_quiz_questions::
+        
+        where('online_quiz_questions.online_quiz_id',$quiz_id)
+       
+        ->join('online_quiz_statuses','online_quiz_statuses.online_quiz_question_id','online_quiz_questions.id')
+        ->where('online_quiz_statuses.user_id',$userid)
+        ->select('online_quiz_questions.*','online_quiz_statuses.user_answer','online_quiz_statuses.result as answerd')
+        ->get();
+        foreach($questions as $q){  $qids[] = $q->id;  }
+        // return $vals;
         //return 'Answers will be opened soon.....';
+        // return 
         $total_questions = $questions->count();
         /*
             Evaluate each question attended
             Check whether the answer is correct
         */
-        foreach ($questions as $question){
-            $quiz_data = online_quiz_statuses::where('online_quiz_question_id',$question->id)->where('user_id',Auth::user()->id)->get();
-            // return $quiz_data;
-            foreach ($quiz_data as $result){
-                if($question->id == $result->online_quiz_question_id){
-                    $total = $total+1;
-                    if($question->answer == $result->user_answer){
-                        $score+=1;
-                        $question->answerd = true;
-                    }
-                    else{
-                        $question->answerd = false;
-                    }
-                    $question->user_answer = $result->user_answer;
+        // $users=user::get(['id'])->toarray();
+        
+        // return $userid;
+        // $mystr='Calculated for ids... ';
+        $status ='unkown';
+        // foreach ($users as $useride){
+            // $userid=$useride['id'];
+            $result_not_exists = DB::table('online_quiz_results')->where('user_id',$userid)->where('quiz_id',$quiz_id)->doesntExist();
+            // return $enquiry;
+            //store all quiz results in online_quiz_results table.
+            // return
+            // $quiz_result = online_quiz_statuses::wherein('online_quiz_question_id',$qids)->where('user_id',$userid)->get(['user_answer','result']);
+            $total_questions=$questions ->count();
+            
+            $score= $questions->where('answerd','true')->count();
+            if($total_questions>0){ 
+
+                if(($score/$total_questions)*100 >= constants::min_score_for_pass ){ $status ='passed'; } else{$status = 'failed';}
+
+                 if($result_not_exists){                
+                                  
+                   
+                    // $mystr= $mystr.', '.(string)($userid); 
+                    $quiz_results = new online_quiz_results();
+                    $quiz_results->user_id = $userid;
+                    $quiz_results->quiz_id = $quiz_id;
+                    $quiz_results->score = $score;
+                    $quiz_results->total = $total_questions;
+                    $quiz_results->save(); 
                 }
             }
-        }
-        /* inserting results into quizstatuses table */
+   
+        $now = Carbon::now();
+        // return
+        $exam_submitted = $questions->last()['created_at'];
+        // return $exam_submitted ;
+        // $gameStart = Carbon::parse($exam_submitted->created_at, 'Asia/Kolkata');
+        $gameStart = Carbon::parse($exam_submitted, 'UTC');
 
-        /*checking wether the score is above 80%*/
-        if(($score/$total)*100 >= constants::min_score_for_pass ){
-            $status ='passed';
+        if($now->diffInHours($gameStart)>48){
+            echo 'Now it can be opened';
+            // return
+            $results = [
+                'total' => $total_questions, 
+                'score' =>$score,
+                'status'=>$status
+            ];
+            // return $questions;
+            
+            return view('online_quiz.viewResult')->with(['questions'=>$questions,'results'=>collect($results)]);
+        }else{
+            echo 'Results will be opened in '.(string)(48-$now->diffInHours($gameStart)) .'hours. Now you can close this window or go back...';
         }
-        else{
-            $status = 'failed';
-        }
+        
 
-
-        if($score == 0)
-        {
-            $score = 0;
-        }
-        /*quiz results*/
-        $results = [
-            'total' => $total, 
-            'score' =>$score,
-            'status'=>$status
-        ];
-        if($score == 0)
-        {
-            $score = 0;
-        }
-        $enquiry = DB::table('online_quiz_results')->where('user_id',Auth::user()->id)->where('quiz_id',$quiz_id)->count();
-        // return $enquiry;
-        //store all quiz results in online_quiz_results table.
-        if($enquiry == 0)
-        {
-            $quiz_results = new online_quiz_results();
-            $quiz_results->user_id = Auth::user()->id;
-            $quiz_results->quiz_id = $quiz_id;
-            $quiz_results->score = $score;
-            $quiz_results->total = $total_questions;
-            $quiz_results->save(); 
-        }
-
-        return view('online_quiz.viewResult')->with(['questions'=>$questions,'results'=>collect($results)]);
+        
     
     }
 

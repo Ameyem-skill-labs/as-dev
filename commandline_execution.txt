@@ -1,0 +1,32 @@
+php command line execution
+--------------------------
+
+
+php -a
+echo function_exists("foo") ? "yes" : "no";
+
+from laravel:
+
+php artisan make:command MyCommand
+
+Go to /app/Console/Commands/MyCommand.php
+
+Find:
+
+protected $signature = 'command:name';
+Change to:
+
+protected $signature = 'my:command';
+There's handle() method there you are able to fire some code:
+
+public function handle()
+{
+    echo 'Hello world';
+}
+In the /app/Console/Kernel.php you will find protected variable $commands. Add your Command's class name.
+
+protected $commands = [
+    // ...
+    Commands\MyCommand::class,
+];
+Run php artisan my:command
