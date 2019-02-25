@@ -113,13 +113,13 @@ class MyCommand extends Command
         $i=0;
         foreach ($users as $useride){
             $userid=$useride['id'];
-            // $result_not_exists = DB::table('online_quiz_results')->where('user_id',$userid)->where('quiz_id',$quiz_id)->doesntExist();
+            $result_not_exists = DB::table('online_quiz_results')->where('user_id',$userid)->where('quiz_id',$quiz_id)->doesntExist();
             $res_score=DB::table('online_quiz_results')->where('user_id',$userid)->where('quiz_id',$quiz_id)->first(['score']);
             // var_dump($res_score->score);
             // return;
             //     // return $enquiry;
         //     //store all quiz results in online_quiz_results table.
-        //     if($result_not_exists){
+            if($result_not_exists){
             $quiz_result = online_quiz_statuses::wherein('online_quiz_question_id',$questions)
             ->where('user_id',$userid)
             ->where('created_at','<','2019-02-22 16:41:58')
@@ -155,7 +155,7 @@ class MyCommand extends Command
                     //     echo 'Message: ' .$e->getMessage();
                     //   }
                     
-                }
+                // }
                 
                     if(($score/$total_questions)*100 >= constants::min_score_for_pass ){ $status ='passed'; } else{$status = 'failed';}
 
@@ -172,8 +172,8 @@ class MyCommand extends Command
                     $quiz_results->score = $score;
                     $quiz_results->total = $total_questions;
                     $quiz_results->save(); 
-        //         }
-        //     }
+                }
+            }
         }
             
         // return $mystr;
