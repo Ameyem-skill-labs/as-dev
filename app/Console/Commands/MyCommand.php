@@ -134,7 +134,7 @@ class MyCommand extends Command
                     $i++;
                     $score= $quiz_result->where('result','true')->count();
                     echo (string)$i.', '.$useride['id'].', '.$useride['first_name'].' '.$useride['last_name'].',   '.$useride['email'].',   '
-                    .$useride['phone_number'].',      '.$useride['name'].',    '.$score.'   '.$res_score->score.'
+                    .$useride['phone_number'].',      '.$useride['name'].',    '.$score.'   '.'
                 ';
 
                     // if(($score/$total_questions)*100 >= constants::min_score_for_pass ){ $status ='passed'; } else{$status = 'failed';}
