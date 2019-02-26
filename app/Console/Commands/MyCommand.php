@@ -96,6 +96,7 @@ class MyCommand extends Command
         //     Evaluate each question attended
         //     Check whether the answer is correct
         // */
+        // return
         $users=user::join('institutes','institutes.id','users.institutes_id')
         ->get(['users.id','users.first_name','users.last_name','users.email','users.phone_number','institutes.name'])->toarray();
         // $userid=Auth::user()->id;
@@ -103,6 +104,8 @@ class MyCommand extends Command
         // foreach ($users as $useride){
         //     $mystr=$mystr.$useride['first_name'].'
         //     ';
+        //     echo (string)$i.', '.$useride['id'].', '.$useride['first_name'].' '.$useride['last_name'].',   '.$useride['email'].',   '
+        //             .$useride['phone_number'].',      '.$useride['name'].',    '.$score.'   '.$res_score->score;
         // }
         // echo $mystr;
         // return;
@@ -119,7 +122,7 @@ class MyCommand extends Command
             // return;
             //     // return $enquiry;
         //     //store all quiz results in online_quiz_results table.
-            if($result_not_exists){
+            // if($result_not_exists){
             $quiz_result = online_quiz_statuses::wherein('online_quiz_question_id',$questions)
             ->where('user_id',$userid)
             ->where('created_at','<','2019-02-22 16:41:58')
@@ -171,10 +174,14 @@ class MyCommand extends Command
                     $quiz_results->quiz_id = $quiz_id;
                     $quiz_results->score = $score;
                     $quiz_results->total = $total_questions;
-                    $quiz_results->save(); 
+                    if($result_not_exists){
+                        $quiz_results->save(); 
+                    }
+
+                    
                 }
             }
-        }
+        // }
             
         // return $mystr;
 
