@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
-<?php $i = 1; ?>
+<?php $i = 1;
+
+ ?>
 <style>
         #quiz_maker{
                 background: white;
@@ -61,10 +63,13 @@
 
                 @foreach($questions as $question)
                 <?php
-                if($question->answerd == false){
+                
+                if($question->answerd == 'false'){
+                       
                         $statusColor = "wrong";
                         $buttonText = "wrong";
                 }else{
+                        
                         $statusColor = "correct";
                         $buttonText = "correct";
                 }
